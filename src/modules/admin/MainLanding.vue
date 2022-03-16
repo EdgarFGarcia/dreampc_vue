@@ -1,6 +1,6 @@
 <template>
-    <v-container fill-height fluid>
-      test
+    <v-container fluid>
+      Choose a page on top to get started
     </v-container>
 </template>
 

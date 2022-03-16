@@ -57,6 +57,14 @@ export default {
   mounted () {
   },
   created () {
+    if(localStorage.getItem('token') !== null){
+      let udata = JSON.parse(localStorage.getItem('udata'))
+      if(udata.user_role == 1){
+        this.$router.push({name: 'adminlanding'})
+      }else{
+        this.$router.push({name: 'worker'})
+      }
+    }
   },
   computed: {
   },
@@ -70,13 +78,13 @@ export default {
             if(data.response){
               localStorage.setItem('token', data.data)
               localStorage.setItem('udata', JSON.stringify(data.udata))
-              console.log(data.udata.user_role)
+              this.$store.dispatch('auth/setIsLogged', true)
+              this.$store.dispatch('auth/setUserData', JSON.stringify(data.udata))
               if(data.udata.user_role == 1){
                 this.$router.push({name: 'adminlanding'})
               }
-              
               if(data.udata.user_role == 2){
-                this.$router.push({name: 'client'})
+                this.$router.push({name: 'worker'})
               }
             }
           })
