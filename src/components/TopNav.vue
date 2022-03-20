@@ -27,6 +27,28 @@
             </v-btn>
             <v-btn outlined 
                 class="mr-2"
+                @click="$router.push({name: 'settings'})"
+            >
+                <v-icon class="mr-2">mdi-account-cog</v-icon>Settings
+            </v-btn>
+            <v-btn outlined 
+                class="mr-2"
+                @click="logout"
+            >
+                <v-icon class="mr-2">mdi-logout</v-icon>Logout
+            </v-btn>
+        </div>
+
+        <div v-if="JSON.parse(getUserData).user_role == 2">
+            <v-btn outlined 
+                class="mr-2"
+                @click="$router.push({name: 'order'})"
+            >
+                <v-icon class="mr-2">mdi-folder-star-multiple-outline</v-icon>Orders
+            </v-btn>
+            <v-btn outlined 
+                class="mr-2"
+                @click="$router.push({name: 'settings'})"
             >
                 <v-icon class="mr-2">mdi-account-cog</v-icon>Settings
             </v-btn>

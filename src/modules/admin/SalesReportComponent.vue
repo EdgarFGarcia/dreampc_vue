@@ -1,11 +1,17 @@
 <template>
     <v-container class="flex" fluid>
-      <Datatable :headers="headers" :items="desserts" :config="config"/>
+      <Datatable 
+        :headers="headers" 
+        :items="sales" 
+        :config="config"
+        :setup="setup"
+      />
     </v-container>
 </template>
 
 <script>
 import Datatable from '../../components/DataTable.vue'
+import { mapGetters } from 'vuex'
 export default {
   components: {
     Datatable
@@ -16,89 +22,43 @@ export default {
     config: {
       hasbutton: false
     },
+    setup: {
+      sales: true
+    },
     headers: [
         {
         text: 'Date',
         align: 'start',
-        value: 'name',
+        value: 'created_at',
         },
-        { text: 'Product Name', value: 'calories' },
-        { text: 'Manufacturer', value: 'fat' },
-        { text: 'Product Cost', value: 'carbs' },
-        { text: 'Product Tax', value: 'carbs' },
-        { text: 'Total Cost', value: 'carbs' },
-        { text: 'Status', value: 'carbs' },
-    ],
-    desserts: [
-        {
-        name: 'Frozen Yogurt',
-        calories: 159,
-        fat: 6.0,
-        carbs: 24,
-        },
-        {
-        name: 'Ice cream sandwich',
-        calories: 237,
-        fat: 9.0,
-        carbs: 37,
-        },
-        {
-        name: 'Eclair',
-        calories: 262,
-        fat: 16.0,
-        carbs: 23,
-        },
-        {
-        name: 'Cupcake',
-        calories: 305,
-        fat: 3.7,
-        carbs: 67,
-        },
-        {
-        name: 'Gingerbread',
-        calories: 356,
-        fat: 16.0,
-        carbs: 49,
-        },
-        {
-        name: 'Jelly bean',
-        calories: 375,
-        fat: 0.0,
-        carbs: 94,
-        },
-        {
-        name: 'Lollipop',
-        calories: 392,
-        fat: 0.2,
-        carbs: 98,
-        },
-        {
-        name: 'Honeycomb',
-        calories: 408,
-        fat: 3.2,
-        carbs: 87,
-        },
-        {
-        name: 'Donut',
-        calories: 452,
-        fat: 25.0,
-        carbs: 51,
-        },
-        {
-        name: 'KitKat',
-        calories: 518,
-        fat: 26.0,
-        carbs: 65,
-        },
+        { text: 'Product Name', value: 'product_name' },
+        { text: 'Manufacturer', value: 'manufacturer' },
+        { text: 'Product Cost', value: 'total' },
+        { text: 'Product Tax', value: 'total' },
+        { text: 'Total Cost', value: 'total' },
+        { text: 'Status' },
     ],
   }),
   mounted () {
   },
   created () {
+    if(localStorage.getItem('token') === null){
+      this.$router.push({name: 'index'})
+    }
+    this.fsales()
   },
   computed: {
+    ...mapGetters({
+      sales:      'admin/getSales'
+    })
   },
   methods: {
+    async fsales(){
+      await this.$axios.get('/reports/sales')
+      .then(({data}) => {
+        this.$store.dispatch('admin/setSales', data.data)
+      })
+    }
   },
   watch: {
   }

@@ -60,9 +60,9 @@ export default {
     if(localStorage.getItem('token') !== null){
       let udata = JSON.parse(localStorage.getItem('udata'))
       if(udata.user_role == 1){
-        this.$router.push({name: 'adminlanding'})
+        this.$router.push({name: 'order'})
       }else{
-        this.$router.push({name: 'worker'})
+        this.$router.push({name: 'order'})
       }
     }
   },
@@ -81,11 +81,13 @@ export default {
               this.$store.dispatch('auth/setIsLogged', true)
               this.$store.dispatch('auth/setUserData', JSON.stringify(data.udata))
               if(data.udata.user_role == 1){
-                this.$router.push({name: 'adminlanding'})
+                this.$router.push({name: 'order'})
               }
               if(data.udata.user_role == 2){
-                this.$router.push({name: 'worker'})
+                this.$router.push({name: 'order'})
               }
+            }else{
+              alert(data.message)
             }
           })
         }

@@ -1,101 +1,170 @@
 <template>
     <v-container class="flex" fluid>
-      <Datatable :headers="headers" :items="desserts" :config="config"/>
+      <Datatable 
+        :headers="headers" 
+        :items="getInventory" 
+        :config="config"
+        :setup="setup"
+        @openmodal="openmodal"
+        @removeitem="removeitem"
+      />
+      <Dialog 
+        v-model="dialoginventory"
+        :value="dialoginventory"
+        :data="dialogconfig"
+        @closedialog="closedialog"
+        @savedata="savedata"
+      />
     </v-container>
 </template>
 
 <script>
 import Datatable from '../../components/DataTable.vue'
+import Dialog from '../../components/MoFields.vue'
+import { mapGetters } from 'vuex'
 export default {
   components: {
-    Datatable
+    Datatable,
+    Dialog
   },
   props: [
   ],
   data: () => ({
+    dialoginventory: false,
     config: {
       hasbutton: true
+    },
+    setup: {
+      sales: false
     },
     headers: [
         {
         text: 'Product Name',
         align: 'start',
-        value: 'name',
+        value: 'product_name',
         },
-        { text: 'Item No.', value: 'calories' },
-        { text: 'Condition', value: 'fat' },
-        { text: 'Category', value: 'carbs' },
+        { text: 'Item No.', value: 'item_no' },
+        { text: 'Condition', value: 'condition.name' },
+        { text: 'Category', value: 'category.name' },
     ],
-    desserts: [
+    dialogconfig: {
+      title: 'Add Invetory / Category',
+      dd: [
         {
-        name: 'Frozen Yogurt',
-        calories: 159,
-        fat: 6.0,
-        carbs: 24,
+          id: 1,
+          name: 'Inventory'
         },
         {
-        name: 'Ice cream sandwich',
-        calories: 237,
-        fat: 9.0,
-        carbs: 37,
-        },
+          id: 2,
+          name: 'Category'
+        }
+      ],
+      category_fields: [
         {
-        name: 'Eclair',
-        calories: 262,
-        fat: 16.0,
-        carbs: 23,
-        },
+          label:  'Category',
+          icon:   'mdi-note-check-outline'
+        }
+      ],
+      inventory_fields: [
         {
-        name: 'Cupcake',
-        calories: 305,
-        fat: 3.7,
-        carbs: 67,
-        },
-        {
-        name: 'Gingerbread',
-        calories: 356,
-        fat: 16.0,
-        carbs: 49,
-        },
-        {
-        name: 'Jelly bean',
-        calories: 375,
-        fat: 0.0,
-        carbs: 94,
-        },
-        {
-        name: 'Lollipop',
-        calories: 392,
-        fat: 0.2,
-        carbs: 98,
-        },
-        {
-        name: 'Honeycomb',
-        calories: 408,
-        fat: 3.2,
-        carbs: 87,
-        },
-        {
-        name: 'Donut',
-        calories: 452,
-        fat: 25.0,
-        carbs: 51,
-        },
-        {
-        name: 'KitKat',
-        calories: 518,
-        fat: 26.0,
-        carbs: 65,
-        },
-    ],
+          text_field: [
+            {
+              label:  'Product Name',
+              icon:   'mdi-note-check-outline'
+            },
+            {
+              label:  'Item Number',
+              icon:   'mdi-note-check-outline'
+            },
+            {
+              label:  'Manufacturer',
+              icon:   'mdi-note-check-outline'
+            },
+            {
+              label:  'Price',
+              icon:   'mdi-note-check-outline'
+            }
+          ]
+        }
+      ]
+    }
   }),
   mounted () {
   },
   created () {
+    if(localStorage.getItem('token') === null){
+      this.$router.push({name: 'index'})
+    }
+    this.finventory()
+    this.fcategory()
   },
   computed: {
+    ...mapGetters({
+      getInventory:         'admin/getInventory'
+    })
   },
   methods: {
+    openmodal(){
+      this.dialoginventory = true
+    },
+    closedialog(){
+      this.dialoginventory = false
+    },
+    async finventory(){
+      await this.$axios.get('/inventory/get')
+      .then(({data}) => {
+        this.$store.dispatch('admin/setInventory', data.data)
+        this.$store.dispatch('admin/setConditions', data.condition)
+      })
+    },
+    async fcategory(){
+      await this.$axios.get('/category/get')
+      .then(({data}) => {
+        this.$store.dispatch('admin/setCategory', data.data)
+      })
+    },
+    async savedata(data){
+      if(data.category === null){
+        let tp = {
+          name:     data.tf[0]
+        }
+        await this.$axios.post('/category/addcategory', tp)
+        .then(({data}) => {
+          if(data.response){
+            this.fcategory()
+            this.closedialog()
+          }else{
+            alert(data.message)
+          }
+        })
+      }else{
+        let tp = {
+          product_name:   data.tf[0],
+          item_no:        data.tf[1],
+          manufacturer:   data.tf[2],
+          price:          data.tf[3],
+          category_id:    data.category.id,
+          condition_id:   data.condition.id
+        }
+        await this.$axios.post('/inventory/addinventory', tp)
+        .then(({data}) => {
+          if(data.response){
+            this.finventory()
+            this.closedialog()
+          }else{
+            alert(data.message)
+          }
+        })
+      }
+    },
+    async removeitem(data){
+      await this.$axios.delete(`/inventory/deleteinventory/${data[0].id}`)
+      .then(({data}) => {
+        if(data.response){
+          this.finventory()
+        }
+      })
+    }
   },
   watch: {
   }

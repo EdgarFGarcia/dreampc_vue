@@ -1,112 +1,120 @@
 <template>
     <v-container class="flex" fluid>
-      <Datatable :headers="headers" :items="desserts" :config="config"/>
+      <Datatable 
+        :headers="headers" 
+        :items="getOrders" 
+        :config="config"
+        :setup="setup"
+        @openmodal="openmodal"
+        @removeitem="removeitem"
+      />
+      <Dialog 
+        v-model="dialogaddorder"
+        :value="dialogaddorder"
+        :data="dialogconfig"
+        @closedialog="closedialog"
+        @savedcustomer="savedcustomer"
+      />
     </v-container>
 </template>
 
 <script>
 import Datatable from '../../components/DataTable.vue'
+import Dialog from '../../components/MoFields.vue'
+import { mapGetters } from 'vuex'
 export default {
   components: {
-    Datatable
+    Datatable, Dialog
   },
   props: [
   ],
   data: () => ({
+    dialogaddorder: false,
     config: {
       hasbutton: true
+    },
+    setup: {
+      sales: false
     },
     headers: [
         {
         text: 'Customer Name',
         align: 'start',
-        value: 'name',
+        value: 'customer_name',
         },
-        { text: 'Product Name', value: 'calories' },
-        { text: 'Manufacturer', value: 'fat' },
-        { text: 'Item Number', value: 'carbs' },
-        { text: 'Category', value: 'protein' },
+        { text: 'Product Name', value: 'product_name' },
+        { text: 'Manufacturer', value: 'manufacturer' },
+        { text: 'Item Number', value: 'item_number' },
+        { text: 'Category', value: 'item_number' },
     ],
-    desserts: [
+    dialogconfig: {
+      title: 'Orders',
+      customer: true,
+      dd: [],
+      customer_field: [
         {
-        name: 'Frozen Yogurt',
-        calories: 159,
-        fat: 6.0,
-        carbs: 24,
-        protein: 4.0,
+          label:  'First Name',
+          icon:   'mdi-account'
         },
         {
-        name: 'Ice cream sandwich',
-        calories: 237,
-        fat: 9.0,
-        carbs: 37,
-        protein: 4.3,
-        },
-        {
-        name: 'Eclair',
-        calories: 262,
-        fat: 16.0,
-        carbs: 23,
-        protein: 6.0,
-        },
-        {
-        name: 'Cupcake',
-        calories: 305,
-        fat: 3.7,
-        carbs: 67,
-        protein: 4.3,
-        },
-        {
-        name: 'Gingerbread',
-        calories: 356,
-        fat: 16.0,
-        carbs: 49,
-        protein: 3.9,
-        },
-        {
-        name: 'Jelly bean',
-        calories: 375,
-        fat: 0.0,
-        carbs: 94,
-        protein: 0.0,
-        },
-        {
-        name: 'Lollipop',
-        calories: 392,
-        fat: 0.2,
-        carbs: 98,
-        protein: 0,
-        },
-        {
-        name: 'Honeycomb',
-        calories: 408,
-        fat: 3.2,
-        carbs: 87,
-        protein: 6.5,
-        },
-        {
-        name: 'Donut',
-        calories: 452,
-        fat: 25.0,
-        carbs: 51,
-        protein: 4.9,
-        },
-        {
-        name: 'KitKat',
-        calories: 518,
-        fat: 26.0,
-        carbs: 65,
-        protein: 7,
-        },
-    ],
+          label:  'Last Name',
+          icon:   'mdi-account'
+        }
+      ]
+    }
   }),
   mounted () {
   },
   created () {
+    if(localStorage.getItem('token') === null){
+      this.$router.push({name: 'index'})
+    }
+    this.forders()
   },
   computed: {
+    ...mapGetters({
+      getOrders:            'admin/getOrders'
+    })
   },
   methods: {
+    openmodal(){
+      this.dialogaddorder = true
+    },
+    closedialog(){
+      this.dialogaddorder = false
+    },
+    async forders(){
+      await this.$axios.get('orders/orders')
+      .then(({data}) => {
+        if(data.response){
+          this.$store.dispatch('admin/setOrders', data.data)
+        }
+      })
+    },
+    async savedcustomer(data){
+      let tp = {
+        firstname:  data.cd[0],
+        lastname:   data.cd[1],
+        product:    data.product
+      }
+      await this.$axios.post('orders/addorder', tp)
+      .then(({data}) => {
+        if(data.response){
+          this.forders()
+          this.closedialog()
+        }else{
+          alert(data.message)
+        }
+      })
+    },
+    async removeitem(data){
+      await this.$axios.delete(`orders/deleteorder/${data[0].id}`)
+      .then(({data}) => {
+        if(data.response){
+          this.forders()
+        }
+      })
+    }
   },
   watch: {
   }

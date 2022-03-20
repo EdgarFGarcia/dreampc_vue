@@ -15,6 +15,9 @@ export default {
   mounted () {
   },
   created () {
+    if(localStorage.getItem('token') === null){
+      this.$router.push({name: 'index'})
+    }
   },
   computed: {
   },
