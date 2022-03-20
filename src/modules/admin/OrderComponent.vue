@@ -44,6 +44,7 @@ export default {
         },
         { text: 'Product Name', value: 'product_name' },
         { text: 'Manufacturer', value: 'manufacturer' },
+        { text: 'Quantity', value: 'quantity' },
         { text: 'Item Number', value: 'item_number' },
         { text: 'Category', value: 'item_number' },
     ],
@@ -59,6 +60,10 @@ export default {
         {
           label:  'Last Name',
           icon:   'mdi-account'
+        },
+        {
+          label:  'Quantity',
+          icon:   'mdi-plus-thick'
         }
       ]
     }
@@ -95,7 +100,8 @@ export default {
       let tp = {
         firstname:  data.cd[0],
         lastname:   data.cd[1],
-        product:    data.product
+        product:    data.product,
+        quantity:   data.cd[2]
       }
       await this.$axios.post('orders/addorder', tp)
       .then(({data}) => {

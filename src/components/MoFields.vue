@@ -28,7 +28,7 @@
                         >
                         </v-text-field>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="6">
                         <v-autocomplete
                             v-model="product"
                             :items="getInventory"
@@ -80,7 +80,6 @@
             </v-card-title>
             <v-card-text>
                 <!-- Customer -->
-
                 <v-col 
                     cols="12"
                     v-for="(item, index) in data.customer_field"

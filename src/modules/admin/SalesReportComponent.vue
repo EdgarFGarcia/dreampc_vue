@@ -33,6 +33,7 @@ export default {
         },
         { text: 'Product Name', value: 'product_name' },
         { text: 'Manufacturer', value: 'manufacturer' },
+        { text: 'Quantity', value: 'quantity' },
         { text: 'Product Cost', value: 'total' },
         { text: 'Product Tax', value: 'total' },
         { text: 'Total Cost', value: 'total' },

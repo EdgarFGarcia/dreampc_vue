@@ -49,9 +49,10 @@
                         <td><small>{{ props.item['created_at'] }}</small></td>
                         <td><small>{{ props.item['product_name'] }}</small></td>
                         <td><small>{{ props.item['manufacturer'] }}</small></td>
-                        <td><small>{{ props.item['total'] - (props.item['total'] * .12) }}</small></td>
-                        <td><small>{{ props.item['total'] * .12 }}</small></td>
+                        <td><small>{{ props.item['quantity'] }}</small></td>
                         <td><small>{{ props.item['total'] }}</small></td>
+                        <td><small>{{ props.item['total'] * .12 }}</small></td>
+                        <td><small>{{ props.item['total'] * props.item['quantity'] }}</small></td>
                         <td>
                             <small v-if="props.item['deleted_at'] == null">In Progress</small>
                             <small v-else>Delivered / Sold</small>
