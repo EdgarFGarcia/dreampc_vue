@@ -46,7 +46,7 @@
                                 <span>Product: {{item.product_name}} - Manufacturer: {{item.manufacturer}} - Item No. {{item.item_no}}</span>
                             </template>
                             <template slot="item" slot-scope="{item}">
-                                <p class='fullName'>Product: {{item.product_name}}, Manufacturer: {{item.manufacturer}}, Item Number: {{item.item_no}}</p>
+                              <p class='fullName'>Product: {{item.product_name}}, Manufacturer: {{item.manufacturer}}, Item Number: {{item.item_no}}</p>
                             </template>
                         </v-autocomplete>
                     </v-col>
@@ -213,12 +213,13 @@ export default {
   mounted () {
   },
   created () {
+    this.finventory()
   },
   computed: {
     ...mapGetters({
       getConditions:        'admin/getConditions',
       getCategory:          'admin/getCategory',
-      getInventory:         'admin/getInventory'
+      getInventory:         'admin/getForOrder'
     })
   },
   methods: {
@@ -236,6 +237,12 @@ export default {
         this.isCategory = false
         this.topass = []
       }
+    },
+    async finventory(){
+      await this.$axios.get('/inventory/getforder')
+      .then(({data}) => {
+        this.$store.dispatch('admin/setForOrder', data.data)
+      })
     },
     savedata(){
       this.$emit('savedata', {tf: this.topass, category: this.category, condition: this.condition})

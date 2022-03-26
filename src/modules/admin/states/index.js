@@ -5,7 +5,8 @@ export default {
       inventory: [],
       conditions: [],
       category: [],
-      sales: []
+      sales: [],
+      fororder: []
     },
     mutations: {
       setOrders(state, payload){
@@ -22,6 +23,9 @@ export default {
       },
       setSales(state, payload){
         state.sales = [...payload]
+      },
+      setForOrder(state, payload){
+        state.fororder = [...payload]
       }
     },
     getters: {
@@ -37,8 +41,33 @@ export default {
       getCategory(state){
         return state.category
       },
-      getSales(state){
-        return state.sales
+      getSales: state => value => {
+        if(value == null){
+          return state.sales
+        }else{
+          if(value.text == 'SOLD'){
+            return state.sales.filter(q => {
+              return q.is_sold == 1
+            })
+          }
+          if(value.text == 'CANCELLED'){
+            return state.sales.filter(q => {
+              return q.is_cancel == 1
+            })
+          }
+          if(value.text == 'IN-PROGRESS'){
+            return state.sales.filter(q => {
+              return q.is_sold == 0 && q.is_cancel == 0
+            })
+          }
+          if(value.text == 'ALL'){
+            return state.sales
+          }
+        }
+        //return state.sales
+      },
+      getForOrder(state){
+        return state.fororder
       }
     },
     actions: {
@@ -56,6 +85,9 @@ export default {
       },
       setSales({commit}, payload){
         commit('setSales', payload)
+      },
+      setForOrder({commit}, payload){
+        commit('setForOrder', payload)
       }
     }
 }

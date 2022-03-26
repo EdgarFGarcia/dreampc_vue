@@ -4,8 +4,10 @@ import vuetify from './plugins/vuetify'
 import axios from './plugins/axios.js'
 import router from './router.js'
 import store from './store/index.js'
+import JsonExcel from "vue-json-excel";
 
 Vue.use(axios)
+Vue.component("downloadExcel", JsonExcel);
 
 Vue.config.productionTip = false
 

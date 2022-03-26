@@ -7,6 +7,8 @@
         :setup="setup"
         @openmodal="openmodal"
         @removeitem="removeitem"
+        @markpaid="markpaid"
+        @markcancel="markcancel"
       />
       <Dialog 
         v-model="dialogaddorder"
@@ -15,6 +17,48 @@
         @closedialog="closedialog"
         @savedcustomer="savedcustomer"
       />
+
+      <v-row justify="center">
+        <v-dialog
+          v-model="dialog"
+          persistent
+          max-width="290"
+        >
+          <v-card>
+            <v-card-title class="text-h5">
+              Receipt
+            </v-card-title>
+            <v-card-text>
+              <v-col cols="12">
+                <strong>Client Name: {{receipt.customer_name}}</strong>
+              </v-col>
+              <v-col cols="12">
+                <strong>Product: {{receipt.product_name}}</strong>
+              </v-col>
+              <v-col cols="12">
+                <strong>Quantity: {{receipt.quantity}}</strong>
+              </v-col>
+              <v-col cols="12">
+                <strong>Price Per Piece: {{receipt.total}}</strong>
+              </v-col>
+              <v-col cols="12">
+                <strong>Total: {{receipt.total * receipt.quantity}}</strong>
+              </v-col>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="green darken-1"
+                text
+                @click="dialog = false"
+              >
+                Close
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-row>
+
     </v-container>
 </template>
 
@@ -29,12 +73,15 @@ export default {
   props: [
   ],
   data: () => ({
+    dialog: false,
+    receipt: {},
     dialogaddorder: false,
     config: {
       hasbutton: true
     },
     setup: {
-      sales: false
+      sales: false,
+      orders: true
     },
     headers: [
         {
@@ -45,8 +92,11 @@ export default {
         { text: 'Product Name', value: 'product_name' },
         { text: 'Manufacturer', value: 'manufacturer' },
         { text: 'Quantity', value: 'quantity' },
+        { text: 'Price' },
+        { text: 'Total'},
         { text: 'Item Number', value: 'item_number' },
         { text: 'Category', value: 'item_number' },
+        { text: 'Action' } 
     ],
     dialogconfig: {
       title: 'Orders',
@@ -108,6 +158,8 @@ export default {
         if(data.response){
           this.forders()
           this.closedialog()
+          this.receipt = data.data
+          this.dialog = true
         }else{
           alert(data.message)
         }
@@ -115,6 +167,22 @@ export default {
     },
     async removeitem(data){
       await this.$axios.delete(`orders/deleteorder/${data[0].id}`)
+      .then(({data}) => {
+        if(data.response){
+          this.forders()
+        }
+      })
+    },
+    async markpaid(item){
+      await this.$axios.patch(`orders/marksold/${item.item.id}`)
+      .then(({data}) => {
+        if(data.response){
+          this.forders()
+        }
+      })
+    },
+    async markcancel(item){
+      await this.$axios.patch(`orders/markcancel/${item.item.id}/${item.item.product_name}`)
       .then(({data}) => {
         if(data.response){
           this.forders()

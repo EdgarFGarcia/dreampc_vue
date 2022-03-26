@@ -11,7 +11,6 @@
 
 <script>
 import Datatable from '../../components/DataTable.vue'
-import { mapGetters } from 'vuex'
 export default {
   components: {
     Datatable
@@ -49,9 +48,7 @@ export default {
     this.fsales()
   },
   computed: {
-    ...mapGetters({
-      sales:      'admin/getSales'
-    })
+    
   },
   methods: {
     async fsales(){

@@ -2,7 +2,7 @@
     <div>
       <v-app-bar
         app
-        color="primary"
+        color="#93328e"
         dark
         v-if="Object.entries(getUserData).length !== 0 && isLogged"
       >
@@ -45,6 +45,12 @@
                 @click="$router.push({name: 'order'})"
             >
                 <v-icon class="mr-2">mdi-folder-star-multiple-outline</v-icon>Orders
+            </v-btn>
+            <v-btn outlined 
+                class="mr-2"
+                @click="$router.push({name: 'salesreport'})"
+            >
+                <v-icon class="mr-2">mdi-chart-bar</v-icon>Reports
             </v-btn>
             <v-btn outlined 
                 class="mr-2"

@@ -7,6 +7,8 @@
         :setup="setup"
         @openmodal="openmodal"
         @removeitem="removeitem"
+        @edititem="edititem"
+        @deleteitem="deleteitem"
       />
       <Dialog 
         v-model="dialoginventory"
@@ -15,6 +17,55 @@
         @closedialog="closedialog"
         @savedata="savedata"
       />
+
+      <v-row justify="center">
+      <v-dialog
+        v-model="dialog"
+        persistent
+        max-width="600px"
+      >
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Add Quantity To: {{itemtoedit.product_name}}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col
+                  cols="12"
+                >
+                  <v-text-field
+                    label="Quantity"
+                    prepend-icon="mdi-note-check-outline"
+                    v-model="qty"
+                    required
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="dialog = false"
+            >
+              Close
+            </v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="saveitem"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
+
     </v-container>
 </template>
 
@@ -31,11 +82,15 @@ export default {
   ],
   data: () => ({
     dialoginventory: false,
+    dialog: false,
+    itemtoedit: {},
+    qty: null,
     config: {
       hasbutton: true
     },
     setup: {
-      sales: false
+      sales: false,
+      orders: false
     },
     headers: [
         {
@@ -45,7 +100,9 @@ export default {
         },
         { text: 'Item No.', value: 'item_no' },
         { text: 'Condition', value: 'condition.name' },
+        { text: 'Quantity', value: 'quantity' },
         { text: 'Category', value: 'category.name' },
+        { text: 'Action' }
     ],
     dialogconfig: {
       title: 'Add Invetory / Category',
@@ -82,6 +139,10 @@ export default {
             },
             {
               label:  'Price',
+              icon:   'mdi-note-check-outline'
+            },
+            {
+              label:  'Quantity',
               icon:   'mdi-note-check-outline'
             }
           ]
@@ -144,7 +205,8 @@ export default {
           manufacturer:   data.tf[2],
           price:          data.tf[3],
           category_id:    data.category.id,
-          condition_id:   data.condition.id
+          condition_id:   data.condition.id,
+          quantity:       data.tf[4]
         }
         await this.$axios.post('/inventory/addinventory', tp)
         .then(({data}) => {
@@ -162,6 +224,31 @@ export default {
       .then(({data}) => {
         if(data.response){
           this.finventory()
+        }
+      })
+    },
+    async deleteitem(item){
+      await this.$axios.delete(`inventory/deleteinventory/${item.item.id}`)
+      .then(({data}) => {
+        if(data.response){
+          this.finventory()
+        }
+      })
+    },
+    edititem(item){
+      //console.log(item.item)
+      this.itemtoedit = item.item
+      this.dialog = true
+    },
+    async saveitem(){
+      console.log(this.itemtoedit)
+      console.log(this.qty)
+      await this.$axios.patch(`/inventory/addqty/${this.itemtoedit.id}`, {qty: this.qty})
+      .then(({data}) => {
+        if(data.response){
+          this.finventory()
+          this.dialog = false
+          this.qty = null
         }
       })
     }
