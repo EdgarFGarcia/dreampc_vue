@@ -40,6 +40,12 @@
                     v-model="qty"
                     required
                   ></v-text-field>
+                  <v-text-field
+                    label="Price"
+                    prepend-icon="mdi-note-check-outline"
+                    v-model="price"
+                    required
+                  ></v-text-field>
                 </v-col>
               </v-row>
             </v-container>
@@ -85,6 +91,7 @@ export default {
     dialog: false,
     itemtoedit: {},
     qty: null,
+    price: null,
     config: {
       hasbutton: true
     },
@@ -99,6 +106,7 @@ export default {
         value: 'product_name',
         },
         { text: 'Item No.', value: 'item_no' },
+        { text: 'Price', value: 'price' },
         { text: 'Condition', value: 'condition.name' },
         { text: 'Quantity', value: 'quantity' },
         { text: 'Category', value: 'category.name' },
@@ -243,7 +251,7 @@ export default {
     async saveitem(){
       console.log(this.itemtoedit)
       console.log(this.qty)
-      await this.$axios.patch(`/inventory/addqty/${this.itemtoedit.id}`, {qty: this.qty})
+      await this.$axios.patch(`/inventory/addqty/${this.itemtoedit.id}`, {qty: this.qty, price: this.price})
       .then(({data}) => {
         if(data.response){
           this.finventory()

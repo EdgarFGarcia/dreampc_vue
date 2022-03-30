@@ -49,6 +49,11 @@
                         </td>
                         <td>
                             <label :style="props.item['quantity'] < 10 ? 'color: white;' : 'color: black;'">
+                                {{ props.item['price'] }}
+                            </label>
+                        </td>
+                        <td>
+                            <label :style="props.item['quantity'] < 10 ? 'color: white;' : 'color: black;'">
                                 {{ props.item['condition'].name }}
                             </label>
                         </td>
@@ -98,7 +103,7 @@
                         <td>{{ props.item['total'] }}</td>
                         <td>{{ props.item['quantity'] * props.item['total'] }}</td>
                         <td>{{ props.item['item_number'] }}</td>
-                        <td>{{ props.item['item_number'] }}</td>
+                        <td>{{ props.item['get_category'].name }}</td>
                         <td>
                             <v-btn
                                 color="primary"
